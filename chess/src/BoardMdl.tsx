@@ -168,7 +168,7 @@ function Tracker(props:any){
   const showList =(item:{piece:string,id:number,origin:string,destination:string})=>{
   
     return (
-      <p><span>{item.id}. {namedPieces[item.piece]} from</span> <span>{item.origin} to {item.destination}</span></p>
+      <p><span>{item.id}. {namedPieces[item.piece]} from</span> <span><b>{item.origin}</b> to <b>{item.destination}</b></span></p>
     );
 
   };
