@@ -1,11 +1,15 @@
-import React from 'react';
-import Pboard from "./integrations/pandaBoard";
+import React, { useState } from 'react';
 import './App.css';
+import PandaBoard from "./BoardMdl"
+
 
 function App() {
+
+  //add prop to pandaBoard, which determines what mode user is playing as for different modes
   return (
     <div className="App">
-      <Pboard/>
+      <PandaBoard/>
+     
     </div>
   );
 }
