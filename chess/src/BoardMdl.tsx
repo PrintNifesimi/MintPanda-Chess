@@ -66,7 +66,10 @@ flex-direction: column-reverse;
 
 
 `
-
+const MintPanda=styled.div`
+font-family: 'Acme', sans-serif;
+font-size:50px;
+`
 
 function PandaBoard() {
   const pieces = [
@@ -237,7 +240,7 @@ function PandaBoard() {
     }
   }
   function onDrop(fromSquare:any, toSquare:any,piece:any) {
-    console.log(gameEnd)
+   
     if(game.turn()!=='w') return false
     setInvalidSquare({})
     setValidSquare({})
@@ -319,8 +322,10 @@ function PandaBoard() {
     return returnPieces;
   }
 
-  return (
+  return ( 
+   
    <div className="container justify-content-center mt-5">
+    <MintPanda>Mint-Panda</MintPanda>
     <Win status={gameEnd}/>
     <div className="container">
       <div className="row">
@@ -369,7 +374,7 @@ function PandaBoard() {
         </div>
        
          <div className="col mt-5" >
-        <DivTracker id="trackerDiv" className="table-responsive mt-4">
+        <DivTracker id="trackerDiv" className="table-responsive mt-4 rounded rounded-4 overflow-hidden ">
      <Tracker list={movesList["moves"]}/>
      </DivTracker>
      <CustomButton
@@ -464,7 +469,7 @@ function Tracker(props:any){
  
   
   return(
-    
+   
       <table className="table table-striped table-dark">
     <thead>
       <tr>
@@ -480,12 +485,12 @@ function Tracker(props:any){
      
     </tbody>
   </table>
-   
+  
   );
 }
 
 function Win(props:any){
-  if(props.status[0]=="checkmate"){
+  if(props.status[0]==="checkmate"){
     return (
     <div className="alert alert-success mb-3" role="alert">
     Wow how did you win {props.status[1]}
@@ -497,7 +502,7 @@ function Win(props:any){
   }
   else{
     return (<div className="alert alert-warning alert-dismissible fade show" role="alert">
-    <strong>WAGWAN!</strong> My Guy/Gal. Enjoy.
+    <strong>WAGWAN!</strong> My Guy's/Gal's. Enjoy.
   </div>)
   
   }
