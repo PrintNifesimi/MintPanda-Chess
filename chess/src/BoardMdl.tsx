@@ -36,7 +36,7 @@ const CustomButton = styled.button`
   background-color:#76D7C4;
   color: #000 ;
   cursor: pointer;
-  border: 3px solid  #d3d3d3;
+  border: 3px white;
   padding: 0.25em 0.5em;
   box-shadow: 1px 1px 0px 0px #51998B, 2px 2px 0px 0px #51998B, 3px 3px 0px 0px #51998B, 4px 4px 0px 0px #51998B, 5px 5px 0px 0px #51998B;
   position: relative;
