@@ -33,12 +33,12 @@ code {
   #takenPieces{
     display:none;
   }
-  #trackerDiv{
-    overflow-y: auto;
+  #trackerDiv{ 
+    height: 350px;
+    overflow-y: scroll;
     display:flex; 
-    height: 400px;
-      display: flex;
-    flex-direction: column-reverse;
+   
+   
   }
 }
 
@@ -54,11 +54,10 @@ code {
     width:430px;
   }
   #trackerDiv{
-    overflow-y: auto;
+    overflow-y: scroll;
     display:flex; 
-    height: 400px;
-      display: flex;
-    flex-direction: column-reverse;
+    height: 350px;
+    
   }
 }
 @media (min-width:769px) and (max-width: 991px){
