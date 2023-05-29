@@ -2,7 +2,7 @@ import { Chess } from "chess.js";
 import React from "react";
 import { useState } from "react";
 import { Chessboard } from "react-chessboard";
-import "./index.css"
+
 
 const namedPieces:any={
   "wP":"White Pawn",
@@ -39,14 +39,19 @@ function PandaBoard() {
   const [invalidSquare, setInvalidSquare] = useState({});
   const [validSquare, setValidSquare] = useState({});
   const [movesList, setMovesList]=useState<any>({moves:[]});
-  const [deadPieces, updateDeadPieces]=useState<any>({w:[],b:[]})
-  const [keyDuplicate, setKeyDuplicate]=useState<any>({})
+  const [deadPieces, updateDeadPieces]=useState<any>({w:{'p': 0, 'n': 0, 'b': 0, 'r': 0, 'q': 0},b:{'p': 0, 'n': 0, 'b': 0, 'r': 0, 'q': 0}})
+  const [currentTimeout,setCurrentTimeout]=useState<NodeJS.Timeout>();
   
   function mutateGame(changes:any) {
     const updatedState = new Chess();
     updatedState.loadPgn(game.pgn());
+    
     try{
+      
+      
       updatedState.move(changes);
+      
+
 
     }
     catch(err){
@@ -54,7 +59,7 @@ function PandaBoard() {
      
     }
     
-    setGame(updatedState);
+   
     return updatedState;
   }
  function onPieceDragBegin(piece:any,sourceSquare:any){
@@ -76,8 +81,22 @@ function PandaBoard() {
     validMoves[sourceSquare]={background:game.get(sourceSquare).color}
     setValidSquare(validMoves)
  }
-  //AI
-  function onDragOverSquare(square:any){
+
+ function makeRandomMove(change:Chess){
+  const possibleMoves = change.moves();
+
+  // exit if the game is over
+  if (change.isGameOver() || change.isDraw() || possibleMoves.length === 0) return;
+
+  const randomIndex = Math.floor(Math.random() * possibleMoves.length);
+  change.move(possibleMoves[randomIndex]);
+  
+  let history:any = change.history({verbose:true})
+  history=history[history.length-1]
+  updateMovesTracker(change,history["from"],history["to"],'b'+history["piece"].toUpperCase(),true)
+ }
+
+ function onDragOverSquare(square:any){
     
     const invalidMove:any={}
     if(!(square in validSquare)){
@@ -90,44 +109,69 @@ function PandaBoard() {
   
     return true;
   }
-  function checkKill(game:Chess){
-    let history = game.history({verbose:true})
-    let lastMoveDetails:any = history[history.length-1];
-    let key = lastMoveDetails["piece"]+lastMoveDetails["captured"]+lastMoveDetails["after"]
-    if (lastMoveDetails["captured"] && !keyDuplicate[key]){
-      
-        setKeyDuplicate({...keyDuplicate,key:true});
-        return [true,game.turn()+lastMoveDetails["captured"].toUpperCase()]
+  function checkKill(game:Chess,color:string){
+    const captured:any = {'p': 0, 'n': 0, 'b': 0, 'r': 0, 'q': 0}
+
+    for (const move of game.history({ verbose: true })) {
+        if (move.hasOwnProperty("captured") && move.color !== color[0]) {
+            captured[move.captured!]++
+        }
     }
-    else{
-     
-      return [false,"none"]
+    let currentDeadPieces = deadPieces
+    currentDeadPieces[color[0]]=captured
+    updateDeadPieces(currentDeadPieces)
+    return true
     }
 
-  }
+  
   function getPieceCurrSquare(type:string,color:string){
-      let piece = {type:type,color:color}
-      const get_piece_positions = (game:any, piece:any) => {
-        return [].concat(...game.board()).map((p:any, index) => {
-          if (p !== null && p.type === piece.type && p.color === piece.color) {
-            return index
-          }
-          return 0;
-        }).filter(Number.isInteger).map((piece_index:any) => {
-          const row = 'abcdefgh'[piece_index % 8]
-          const column = Math.ceil((64 - piece_index) / 8)
-          return row + column
-        })
-      }
+    
+      let board = game.board();
       
-      return get_piece_positions(game,piece);
+      for (let row in board){
+        for (let squarePiece in board[row]){
+
+             let details:any=board[row][squarePiece]
+             if (details==null) continue
+             if (details["type"]===type && details["color"]===color){
+               return details["square"]
+             
+          }
+          
+           
+
+        }
+      }
+
+      
+     
+      //const row = 'abcdefgh'[index % 8]
+      //const column = Math.ceil((64 - index) / 8)
+         
+      
+      
+      
+     
   }
   function checkHandler(incheck:string){
     
-    let kingPos:string[] = getPieceCurrSquare('k',incheck)
+    let kingPos:string = getPieceCurrSquare('k',incheck)
+   
     let invalidMove:any ={}
-    invalidMove[kingPos[0]]={background:"none repeat scroll 0 0 rgba(154, 42, 42, 0.30)"}
+    invalidMove[kingPos]={background:"none repeat scroll 0 0 rgba(154, 42, 42, 0.30)"}
     setInvalidSquare(invalidMove)
+  }
+  function updateMovesTracker(change:Chess,fromSquare:string,toSquare:any,piece:any,random:boolean=false){
+   
+    if(toSquare in validSquare || random){
+      let prevMoves = movesList["moves"];
+      prevMoves.push({piece:piece,id:prevMoves.length+1,origin:fromSquare,destination:toSquare})
+      setMovesList({moves:prevMoves})
+     
+     
+      checkKill(change,"white")
+      checkKill(change,"black")
+    }
   }
   function onDrop(fromSquare:any, toSquare:any,piece:any) {
     setInvalidSquare({})
@@ -138,26 +182,31 @@ function PandaBoard() {
       promotion: "q",
       strict:true,
     }); 
- 
-    if (change.inCheck()) checkHandler(change.turn())
-    if(change == null){return false}
-    let kill =checkKill(change)
-    console.log(kill)
-    if(kill[0]){
-      let takenPieces = deadPieces;
-      takenPieces[change.turn()].push([takenPieces[change.turn()].length+1,kill[1]]);
-      updateDeadPieces(takenPieces);
+
+    if (toSquare in validSquare){
+       updateMovesTracker(change,fromSquare,toSquare,piece) 
+       makeRandomMove(change)
     }
-    if(toSquare in validSquare){
-      let prevMoves = movesList["moves"];
-     
-      prevMoves.push({piece:piece,id:prevMoves.length+1,origin:fromSquare,destination:toSquare,kill:kill})
-      setMovesList({moves:prevMoves})
-    }
-    if(game.isGameOver()){
+   
+   
+   
+   
+    setGame(change); 
+      
+    if (change.inCheck()) checkHandler(change.turn()) 
+   
+    if(change == null){return false} 
+    //change.move('c6') 
+   
+   
+   
+   
+    if(game.isGameOver() || change.isGameOver()){
      
       gameOver();
     }
+    
+   
     
     //call Ai
     return true;
@@ -199,7 +248,7 @@ function PandaBoard() {
 
   return (
    <div className="">
-    <div><Takenpieces deadPieces={deadPieces} color={"w"}/></div>
+    <div><Takenpieces deadPieces={deadPieces["w"]} color={"w"}/></div>
     <div className="">
     <Chessboard
       id="panda-Board"
@@ -224,11 +273,20 @@ function PandaBoard() {
     />
     </div>
      <div> 
-      <Takenpieces deadPieces={deadPieces} color={"b"}/>
+      <Takenpieces deadPieces={deadPieces["b"]} color={"b"}/>
       
      </div>
      <div>
      <Tracker list={movesList["moves"]}/>
+     <button
+        onClick={
+              ()=>{
+               setGame(new Chess())
+               setMovesList({moves:[]})
+               updateDeadPieces({w:{'p': 0, 'n': 0, 'b': 0, 'r': 0, 'q': 0},b:{'p': 0, 'n': 0, 'b': 0, 'r': 0, 'q': 0}})
+              }
+
+        }/>
      </div>
    </div>
 
@@ -237,12 +295,24 @@ function PandaBoard() {
 }
 
 function Takenpieces(props:any){
+  let pieces:any=[]
+  for(let x in props.deadPieces){
+    let count=0;
+    
+    while (count<props.deadPieces[x]){
+      pieces.push([props.color+x.toUpperCase(),pieces.length]);
+      count+=1;
+    }
+    
+
+  }
   const showPieces = (piece:string)=>{
-    const photo = require(`./img/${piece[1]}.png`)
-      const alt=`${piece[1]}`
+    //{p:2,r:3,...}
+    const photo = require(`./img/${piece[0]}.png`)
+      const alt=`${piece[0]}`
       return (
         <img 
-          key={piece[0]}
+          key={piece+pieces[1]}
           style={{
             marginLeft:"-20px"
 
@@ -253,7 +323,7 @@ function Takenpieces(props:any){
       )
   }
   return (
-    <div>{props.deadPieces[props.color].map(showPieces)}</div>
+    <div>{pieces.map(showPieces)}</div>
 
   )
 }
@@ -265,9 +335,8 @@ function Tracker(props:any){
       return (
        
         
-       ( item.kill[0])
-        ?<p key={item.id}><b>{namedPieces[item.piece]}</b> moved from <b>{item.origin}</b> to <b>{item.destination}</b> and killed <b>{namedPieces[item.kill[1]]}</b> </p>
-        :<p  key={item.id}><b>{namedPieces[item.piece]}</b> moved from <b>{item.origin}</b> to <b>{item.destination}</b></p>
+       
+        <p  key={item.id}><b>{namedPieces[item.piece]}</b> moved from <b>{item.origin}</b> to <b>{item.destination}</b></p>
        
       );
     
