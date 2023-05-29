@@ -141,7 +141,14 @@ function PandaBoard() {
   if (change.isGameOver() || change.isDraw() || possibleMoves.length === 0) gameOver();
 
   const randomIndex = Math.floor(Math.random() * possibleMoves.length);
-  change.move(possibleMoves[randomIndex]);
+  try{
+      change.move(possibleMoves[randomIndex]);
+  }
+  catch(err){
+    
+    return Win({status:["checkmate",'White']})
+  }
+
   
   let history:any = change.history({verbose:true})
   history=history[history.length-1]
@@ -324,17 +331,16 @@ function PandaBoard() {
 
   return ( 
    
-   <div className="container justify-content-center mt-5">
+   <div className="container mt-5">
     <MintPanda>Mint-Panda</MintPanda>
     <Win status={gameEnd}/>
     <div className="container">
-      <div className="row">
-        
-      </div>
-      <div className="row">
+      
+      <div className="row justify-content-center">
         <div className="col mt-5">
               
-
+<div className="d-flex justify-content-center">
+  <div>
     <Chessboard
       id="panda-Board"
       boardWidth={500}
@@ -355,22 +361,18 @@ function PandaBoard() {
         ...validSquare,
       }}
       onPieceDragBegin={onPieceDragBegin}   
-    />
-    <div className="container" >
-      <div className="row justify-content-center">
-          <div className="col-auto mt-3">
-              <div className="" > 
-                  <Takenpieces deadPieces={deadPieces["b"]} color={"b"}/>
-      
-              </div>
+    /></div></div>
+      <div className="container">
+      <div className="row justify-content-between">
+          <div className="col mt-3">
+          <Takenpieces deadPieces={deadPieces["w"]} color={"w"}/>
             </div>
-         <div className="col-md-5 mt-3">
-              <div className="">
-                  <Takenpieces deadPieces={deadPieces["w"]} color={"w"}/>
-              </div>
+         <div className="col mt-3">
+         <Takenpieces deadPieces={deadPieces["b"]} color={"b"}/>
+          </div>
           </div>
         </div>
-    </div>   
+   
         </div>
        
          <div className="col mt-5" >
@@ -494,6 +496,7 @@ function Tracker(props:any){
 }
 
 function Win(props:any){
+  console.log(props.status)
   if(props.status[0]==="checkmate"){
     return (
     <div className="alert alert-success mb-3" role="alert">
