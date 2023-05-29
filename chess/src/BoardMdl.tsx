@@ -496,7 +496,7 @@ function Tracker(props:any){
 }
 
 function Win(props:any){
-  console.log(props.status)
+ 
   if(props.status[0]==="checkmate"){
     return (
     <div className="alert alert-success mb-3" role="alert">
