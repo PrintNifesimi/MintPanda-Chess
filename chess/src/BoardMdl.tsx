@@ -2,6 +2,7 @@ import { Chess } from "chess.js";
 import React from "react";
 import { useState } from "react";
 import { Chessboard } from "react-chessboard";
+import styled from 'styled-components'
 
 
 const namedPieces:any={
@@ -18,7 +19,10 @@ const namedPieces:any={
   "bQ":"Mint Queen",
   "bK":"Mint King",
 }
-
+const StickyTh= styled.th`
+    position:sticky;
+    top:0px;
+  `
 function PandaBoard() {
   const pieces = [
     "wP",
@@ -117,10 +121,17 @@ function PandaBoard() {
             captured[move.captured!]++
         }
     }
+    let oldDeadPieces =  deadPieces[color[0]]
     let currentDeadPieces = deadPieces
     currentDeadPieces[color[0]]=captured
     updateDeadPieces(currentDeadPieces)
-    return true
+
+    for (let key of Object.keys(captured)){
+      if(oldDeadPieces[key]!==captured[key]){
+        return true
+      }
+    }
+    return false
     }
 
   
@@ -165,15 +176,23 @@ function PandaBoard() {
    
     if(toSquare in validSquare || random){
       let prevMoves = movesList["moves"];
-      prevMoves.push({piece:piece,id:prevMoves.length+1,origin:fromSquare,destination:toSquare})
-      setMovesList({moves:prevMoves})
+      
+    
+      if(change.turn()==='w'){
+        
+        prevMoves.push({piece:piece,id:prevMoves.length+1,origin:fromSquare,destination:toSquare,kill:checkKill(change,"white")})
+        
+      }else{
+       
+         prevMoves.push({piece:piece,id:prevMoves.length+1,origin:fromSquare,destination:toSquare,kill:checkKill(change,"black")})
+      }
+      
+     setMovesList({moves:prevMoves})
      
-     
-      checkKill(change,"white")
-      checkKill(change,"black")
     }
   }
   function onDrop(fromSquare:any, toSquare:any,piece:any) {
+    if(game.turn()!=='w') return false
     setInvalidSquare({})
     setValidSquare({})
     const change = mutateGame({
@@ -185,7 +204,8 @@ function PandaBoard() {
 
     if (toSquare in validSquare){
        updateMovesTracker(change,fromSquare,toSquare,piece) 
-       makeRandomMove(change)
+       const newTimeout = setTimeout(makeRandomMove,1500,change)
+       setCurrentTimeout(newTimeout)
     }
    
    
@@ -247,9 +267,11 @@ function PandaBoard() {
   }
 
   return (
-   <div className="">
+   <div className="container justify-content-center mt-5">
     <div><Takenpieces deadPieces={deadPieces["w"]} color={"w"}/></div>
-    <div className="">
+    <div className="container">
+      <div className="row">
+        <div className="col mt-5">
     <Chessboard
       id="panda-Board"
       boardWidth={500}
@@ -271,12 +293,8 @@ function PandaBoard() {
       }}
       onPieceDragBegin={onPieceDragBegin}   
     />
-    </div>
-     <div> 
-      <Takenpieces deadPieces={deadPieces["b"]} color={"b"}/>
-      
-     </div>
-     <div>
+        </div>
+         <div  id="trackerDiv" className="col mt-5 table-responsive" style={{overflowY:"auto",height:"500px"}}>
      <Tracker list={movesList["moves"]}/>
      <button
         onClick={
@@ -284,10 +302,20 @@ function PandaBoard() {
                setGame(new Chess())
                setMovesList({moves:[]})
                updateDeadPieces({w:{'p': 0, 'n': 0, 'b': 0, 'r': 0, 'q': 0},b:{'p': 0, 'n': 0, 'b': 0, 'r': 0, 'q': 0}})
+                clearTimeout(currentTimeout)
               }
 
         }/>
+          </div>
+      </div>
+      
+    </div>
+    
+     <div> 
+      <Takenpieces deadPieces={deadPieces["b"]} color={"b"}/>
+      
      </div>
+    
    </div>
 
 
@@ -329,21 +357,49 @@ function Takenpieces(props:any){
 }
 
 function Tracker(props:any){
+  
   const showList =(item:{piece:string,id:number,origin:string,destination:string,kill:[boolean,string]})=>{
    
-  
+       updateScroll()
       return (
        
         
        
-        <p  key={item.id}><b>{namedPieces[item.piece]}</b> moved from <b>{item.origin}</b> to <b>{item.destination}</b></p>
-       
+        /*<p  key={item.id}><b>{namedPieces[item.piece]}</b> moved from <b>{item.origin}</b> to <b>{item.destination}</b></p>*/
+        <tr key={item.id} className={item.kill?"table-danger":""}>
+        <th scope="row">{item.id}</th>
+        <td>{namedPieces[item.piece]}</td>
+        <td>{item.origin}</td>
+        <td>{item.destination}</td>
+      </tr>
       );
-    
+     
 
   };
+  function updateScroll(){
+    var element = document.getElementById("trackerDiv");
+    if(element){
+      element.scrollTop=element.scrollHeight;
+    }
+    
+  }
   return(
-    <div>{props.list.map(showList)}</div>
+    
+      <table className="table table-striped table-dark">
+    <thead>
+      <tr>
+        
+        <StickyTh scope="col">#</StickyTh>
+        <StickyTh scope="col">Piece</StickyTh>
+        <StickyTh scope="col">From</StickyTh>
+        <StickyTh scope="col">To</StickyTh>
+      </tr>
+    </thead>
+    <tbody>
+      {props.list.map(showList)}
+   
+    </tbody>
+  </table>
   );
 }
 export default PandaBoard;
