@@ -2,7 +2,7 @@ import { Chess } from "chess.js";
 import React from "react";
 import { useState } from "react";
 import { Chessboard } from "react-chessboard";
-import styled from 'styled-components'
+import styled from 'styled-components';
 
 
 const namedPieces:any={
@@ -23,6 +23,51 @@ const StickyTh= styled.th`
     position:sticky;
     top:0px;
   `
+
+const CustomButton = styled.button`
+
+
+
+  font-family: "Open Sans", sans-serif;
+  font-size: 16px;
+  letter-spacing: 2px;
+  text-decoration: none;
+  text-transform: uppercase;
+  background-color:#76D7C4;
+  color: #000 ;
+  cursor: pointer;
+  border: 3px solid  #d3d3d3;
+  padding: 0.25em 0.5em;
+  box-shadow: 1px 1px 0px 0px #51998B, 2px 2px 0px 0px #51998B, 3px 3px 0px 0px #51998B, 4px 4px 0px 0px #51998B, 5px 5px 0px 0px #51998B;
+  position: relative;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+
+
+&:active {
+  box-shadow: 0px 0px 0px 0px;
+  top: 5px;
+  left: 5px;
+}
+
+
+
+`
+
+const DivTracker= styled.div`
+
+height: 400px;
+overflowY: auto;
+display: flex;
+flex-direction: column-reverse;
+
+
+
+
+`
+
+
 function PandaBoard() {
   const pieces = [
     "wP",
@@ -45,7 +90,7 @@ function PandaBoard() {
   const [movesList, setMovesList]=useState<any>({moves:[]});
   const [deadPieces, updateDeadPieces]=useState<any>({w:{'p': 0, 'n': 0, 'b': 0, 'r': 0, 'q': 0},b:{'p': 0, 'n': 0, 'b': 0, 'r': 0, 'q': 0}})
   const [currentTimeout,setCurrentTimeout]=useState<NodeJS.Timeout>();
-  
+  const [gameEnd,setGameEnd]=useState({status:["",""]})
   function mutateGame(changes:any) {
     const updatedState = new Chess();
     updatedState.loadPgn(game.pgn());
@@ -90,7 +135,7 @@ function PandaBoard() {
   const possibleMoves = change.moves();
 
   // exit if the game is over
-  if (change.isGameOver() || change.isDraw() || possibleMoves.length === 0) return;
+  if (change.isGameOver() || change.isDraw() || possibleMoves.length === 0) gameOver();
 
   const randomIndex = Math.floor(Math.random() * possibleMoves.length);
   change.move(possibleMoves[randomIndex]);
@@ -204,7 +249,7 @@ function PandaBoard() {
 
     if (toSquare in validSquare){
        updateMovesTracker(change,fromSquare,toSquare,piece) 
-       const newTimeout = setTimeout(makeRandomMove,1500,change)
+       const newTimeout = setTimeout(makeRandomMove,1100,change)
        setCurrentTimeout(newTimeout)
     }
    
@@ -214,17 +259,17 @@ function PandaBoard() {
     setGame(change); 
       
     if (change.inCheck()) checkHandler(change.turn()) 
-   
+    if(game.isGameOver() || change.isGameOver()){
+     
+      gameOver();
+    }
     if(change == null){return false} 
     //change.move('c6') 
    
    
    
    
-    if(game.isGameOver() || change.isGameOver()){
-     
-      gameOver();
-    }
+   
     
    
     
@@ -234,12 +279,14 @@ function PandaBoard() {
   //from react-chessboard.com
   function gameOver(){
     if(game.isDraw()){
-      console.log("game is draw")
+      setGameEnd({status:["draw"]})
     }else if(game.isCheckmate()){
-      console.log(game.turn()+" Lost")
+      
+      setGameEnd({status:["checkmate",game.turn()]})
     }else if(game.isStalemate()){
-      console.log("Stalemate")
+     setGameEnd({status:["stalemate"]})
     }
+    document.getElementById("resetBtn")?.click()
   }
   function pandaBrand() {
     
@@ -268,10 +315,17 @@ function PandaBoard() {
 
   return (
    <div className="container justify-content-center mt-5">
-    <div><Takenpieces deadPieces={deadPieces["w"]} color={"w"}/></div>
+    <Win status={gameEnd}/>
     <div className="container">
       <div className="row">
+        
+      </div>
+      <div className="row">
         <div className="col mt-5">
+              <div className="mb-4 d-flex justify-content-center">
+                <Takenpieces deadPieces={deadPieces["w"]} color={"w"}/>
+                </div>
+
     <Chessboard
       id="panda-Board"
       boardWidth={500}
@@ -293,10 +347,20 @@ function PandaBoard() {
       }}
       onPieceDragBegin={onPieceDragBegin}   
     />
+     <div className="mt-4 d-flex justify-content-center" > 
+      <Takenpieces deadPieces={deadPieces["b"]} color={"b"}/>
+      
+     </div>
         </div>
-         <div  id="trackerDiv" className="col mt-5 table-responsive" style={{overflowY:"auto",height:"500px"}}>
+       
+         <div className="col mt-5" >
+        <DivTracker id="trackerDiv" className="table-responsive mt-4">
      <Tracker list={movesList["moves"]}/>
-     <button
+     </DivTracker>
+     <CustomButton
+       
+       id="resetBtn"
+       className="mt-3"
         onClick={
               ()=>{
                setGame(new Chess())
@@ -305,21 +369,22 @@ function PandaBoard() {
                 clearTimeout(currentTimeout)
               }
 
-        }/>
+        }>Restart</CustomButton>
           </div>
       </div>
       
     </div>
     
-     <div> 
-      <Takenpieces deadPieces={deadPieces["b"]} color={"b"}/>
-      
-     </div>
     
+    <span className="align-text-bottom text-secondary" style={{bottom:"2px",position:"absolute"}}>Made at <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-house-fill" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="m8 3.293 6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293l6-6zm5-.793V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z"></path>
+        <path fill-rule="evenodd" d="M7.293 1.5a1 1 0 0 1 1.414 0l6.647 6.646a.5.5 0 0 1-.708.708L8 2.207 1.354 8.854a.5.5 0 1 1-.708-.708L7.293 1.5z"></path>
+      </svg> by Nifesimi</span>
    </div>
-
+   
 
   );
+ 
 }
 
 function Takenpieces(props:any){
@@ -360,7 +425,7 @@ function Tracker(props:any){
   
   const showList =(item:{piece:string,id:number,origin:string,destination:string,kill:[boolean,string]})=>{
    
-       updateScroll()
+      
       return (
        
         
@@ -376,13 +441,11 @@ function Tracker(props:any){
      
 
   };
-  function updateScroll(){
-    var element = document.getElementById("trackerDiv");
-    if(element){
-      element.scrollTop=element.scrollHeight;
-    }
-    
-  }
+  
+ 
+ 
+ 
+  
   return(
     
       <table className="table table-striped table-dark">
@@ -397,9 +460,29 @@ function Tracker(props:any){
     </thead>
     <tbody>
       {props.list.map(showList)}
-   
+     
     </tbody>
   </table>
+   
   );
+}
+
+function Win(props:any){
+  if(props.status[0]=="checkmate"){
+    return (
+    <div className="alert alert-success mb-3" role="alert">
+    Wow how did you win {props.status[1]}
+  </div>)
+  }else if(props.status[0]==="draw" || props.status[0]==="stalemate"){
+    return(<div className="alert alert-danger mb-3" role="alert">
+      No way you just drew with a robot damn {props.status[0]}
+</div>)
+  }
+  else{
+    return (<div className="alert alert-warning alert-dismissible fade show" role="alert">
+    <strong>WAGWAN!</strong> My Guy/Gal. Enjoy.
+  </div>)
+  
+  }
 }
 export default PandaBoard;
