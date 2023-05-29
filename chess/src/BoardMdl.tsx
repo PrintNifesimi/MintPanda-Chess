@@ -3,6 +3,7 @@ import React from "react";
 import { useState } from "react";
 import { Chessboard } from "react-chessboard";
 import styled from 'styled-components';
+import {device} from './DeviceWidths'
 
 
 const namedPieces:any={
@@ -26,8 +27,6 @@ const StickyTh= styled.th`
 
 const CustomButton = styled.button`
 
-
-
   font-family: "Open Sans", sans-serif;
   font-size: 16px;
   letter-spacing: 2px;
@@ -36,7 +35,7 @@ const CustomButton = styled.button`
   background-color:#76D7C4;
   color: #000 ;
   cursor: pointer;
-  border: 3px solid  #d3d3d3;
+  border: 3px solid  white;
   padding: 0.25em 0.5em;
   box-shadow: 1px 1px 0px 0px #51998B, 2px 2px 0px 0px #51998B, 3px 3px 0px 0px #51998B, 4px 4px 0px 0px #51998B, 5px 5px 0px 0px #51998B;
   position: relative;
@@ -53,14 +52,26 @@ const CustomButton = styled.button`
 
 
 
+@media ${device.mobileM}{
+  margin-bottom:130px;
+
+}
+
+
 `
 
 const DivTracker= styled.div`
 
-height: 400px;
+
 overflowY: auto;
-display: flex;
+display:flex; 
+height: 400px;
+  display: flex;
 flex-direction: column-reverse;
+
+
+
+
 
 
 
@@ -70,6 +81,12 @@ const MintPanda=styled.div`
 font-family: 'Acme', sans-serif;
 font-size:50px;
 `
+
+
+
+
+
+
 
 function PandaBoard() {
   const pieces = [
@@ -94,6 +111,9 @@ function PandaBoard() {
   const [deadPieces, updateDeadPieces]=useState<any>({w:{'p': 0, 'n': 0, 'b': 0, 'r': 0, 'q': 0},b:{'p': 0, 'n': 0, 'b': 0, 'r': 0, 'q': 0}})
   const [currentTimeout,setCurrentTimeout]=useState<NodeJS.Timeout>();
   const [gameEnd,setGameEnd]=useState({status:["",""]})
+
+
+ 
   function mutateGame(changes:any) {
     const updatedState = new Chess();
     updatedState.loadPgn(game.pgn());
@@ -311,16 +331,17 @@ function PandaBoard() {
       const photo = require(`./img/${val}.png`)
       const alt=`${val}`
       returnPieces[val] = (squareWidth:any) => (
+       
         <img
-          style={{
-            width: val==="wP"||val==="bP"? squareWidth:squareWidth,
-            height: val==="wP"||val==="bP"? "auto":squareWidth,
-            marginTop: val==="wP"||val==="bP"? "30%":"10%",
-            marginLeft: val==="wK"||val==="bK"?"12%":"auto"
+        style={{
+         
+          marginTop: val==="wP"||val==="bP"? "30%":"10%",
+          marginLeft: val==="wK"||val==="bK"?"12%":"auto"
 
-          }}
-          src={photo}
-          alt={alt}
+        }}
+        src={photo}
+        alt={alt}
+          
         />
       );
     });
@@ -339,11 +360,12 @@ function PandaBoard() {
       <div className="row justify-content-center">
         <div className="col mt-5">
               
-<div className="d-flex justify-content-center">
-  <div>
+
+  <div id="chessdiv" className="mx-auto">
+  
     <Chessboard
       id="panda-Board"
-      boardWidth={500}
+      
       position={game.fen()}
       onPieceDrop={onDrop}
       customBoardStyle={{
@@ -361,14 +383,14 @@ function PandaBoard() {
         ...validSquare,
       }}
       onPieceDragBegin={onPieceDragBegin}   
-    /></div></div>
+    /></div>
       <div className="container">
       <div className="row justify-content-between">
-          <div className="col mt-3">
-          <Takenpieces deadPieces={deadPieces["w"]} color={"w"}/>
+          <div id="takenPieces" className="col mt-3">
+          <Takenpieces  deadPieces={deadPieces["w"]} color={"w"}/>
             </div>
-         <div className="col mt-3">
-         <Takenpieces deadPieces={deadPieces["b"]} color={"b"}/>
+         <div id="takenPieces" className="col mt-3">
+         <Takenpieces  deadPieces={deadPieces["b"]} color={"b"}/>
           </div>
           </div>
         </div>
@@ -376,7 +398,7 @@ function PandaBoard() {
         </div>
        
          <div className="col mt-5" >
-        <DivTracker id="trackerDiv" className="table-responsive mt-4 rounded rounded-4 overflow-hidden ">
+        <DivTracker id="trackerDiv" className="table-responsive rounded rounded-4">
      <Tracker list={movesList["moves"]}/>
      </DivTracker>
      <CustomButton
@@ -396,11 +418,11 @@ function PandaBoard() {
         }>Restart</CustomButton>
           </div>
       </div>
-      <div className="container justify-content-center fixed-bottom" style={{bottom:"2px",}}>
+      <div id="makerCredit" className="container justify-content-center align-text-bottom" style={{bottom:"2px",}}>
       <p >
     <span className="text-secondary" >Made at  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-house-fill" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="m8 3.293 6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293l6-6zm5-.793V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z"></path>
-        <path fill-rule="evenodd" d="M7.293 1.5a1 1 0 0 1 1.414 0l6.647 6.646a.5.5 0 0 1-.708.708L8 2.207 1.354 8.854a.5.5 0 1 1-.708-.708L7.293 1.5z"></path>
+        <path fillRule="evenodd" d="m8 3.293 6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293l6-6zm5-.793V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z"></path>
+        <path fillRule="evenodd" d="M7.293 1.5a1 1 0 0 1 1.414 0l6.647 6.646a.5.5 0 0 1-.708.708L8 2.207 1.354 8.854a.5.5 0 1 1-.708-.708L7.293 1.5z"></path>
       </svg>by Nifesimi, designed by Henry.</span> </p>
           </div>
       

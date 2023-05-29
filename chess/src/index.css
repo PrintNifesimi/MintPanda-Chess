@@ -12,3 +12,107 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+
+
+
+@media (min-width: 320px) and (max-width:500px){
+  img{
+    width:25.94px;
+    height:25.94px;
+   
+  }
+  #chessdiv{
+    width:280px;
+    
+    
+  }
+  #makerCredit{
+    margin-top: 15px;
+  }
+  #takenPieces{
+    display:none;
+  }
+  #trackerDiv{
+    overflow-y: auto;
+    display:flex; 
+    height: 400px;
+      display: flex;
+    flex-direction: column-reverse;
+  }
+}
+
+
+
+@media (min-width:500px) and (max-width: 768px){
+  img {
+    width:37.75px;
+    height:37.75px;
+    
+  }
+  #chessdiv{
+    width:430px;
+  }
+  #trackerDiv{
+    overflow-y: auto;
+    display:flex; 
+    height: 400px;
+      display: flex;
+    flex-direction: column-reverse;
+  }
+}
+@media (min-width:769px) and (max-width: 991px){
+  img {
+    width:40.75px;
+    height:40.75px;
+    
+  }
+  #chessdiv{
+    width:450px;
+  }
+  #trackerDiv{
+    overflow-y: auto;
+    display:flex; 
+    height: 400px;
+      display: flex;
+    flex-direction: column-reverse;
+  }
+}
+@media (min-width: 992px) and (max-width: 1440px){
+  img {
+    width:42.75px;
+    height:42.75px;
+    
+  }
+  #chessdiv{
+    width:500px;
+  }
+  #makerCredit{
+    margin-top: 10%;
+  }
+}
+
+@media (min-width:1441px) and (max-width: 2560px){
+  img {
+    width:44.75px;
+    height:44.75px;
+    
+  }
+  #chessdiv{
+    width:550px;
+  }
+  #makerCredit{
+    margin-top: 10%;
+  }
+
+}
+
+
+
+
+ 
+
+  
+  
+
+ 
