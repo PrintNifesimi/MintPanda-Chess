@@ -94,12 +94,12 @@ code {
 
 @media (min-width:1441px) and (max-width: 2560px){
   img {
-    width:44.75px;
-    height:44.75px;
+    width:42.75px;
+    height:42.75px;
     
   }
   #chessdiv{
-    width:550px;
+    width:500px;
   }
   #makerCredit{
     margin-top: 10%;
