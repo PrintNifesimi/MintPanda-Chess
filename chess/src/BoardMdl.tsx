@@ -237,6 +237,7 @@ function PandaBoard() {
     }
   }
   function onDrop(fromSquare:any, toSquare:any,piece:any) {
+    console.log(gameEnd)
     if(game.turn()!=='w') return false
     setInvalidSquare({})
     setValidSquare({})
@@ -249,8 +250,12 @@ function PandaBoard() {
 
     if (toSquare in validSquare){
        updateMovesTracker(change,fromSquare,toSquare,piece) 
-       const newTimeout = setTimeout(makeRandomMove,1100,change)
-       setCurrentTimeout(newTimeout)
+       if (!game.isGameOver()||!change.isGameOver()){
+         const newTimeout = setTimeout(makeRandomMove,1100,change) 
+         setCurrentTimeout(newTimeout)
+       }
+      
+      
     }
    
    
@@ -278,6 +283,7 @@ function PandaBoard() {
   }
   //from react-chessboard.com
   function gameOver(){
+    
     if(game.isDraw()){
       setGameEnd({status:["draw"]})
     }else if(game.isCheckmate()){
@@ -322,9 +328,7 @@ function PandaBoard() {
       </div>
       <div className="row">
         <div className="col mt-5">
-              <div className="mb-4 d-flex justify-content-center">
-                <Takenpieces deadPieces={deadPieces["w"]} color={"w"}/>
-                </div>
+              
 
     <Chessboard
       id="panda-Board"
@@ -347,10 +351,21 @@ function PandaBoard() {
       }}
       onPieceDragBegin={onPieceDragBegin}   
     />
-     <div className="mt-4 d-flex justify-content-center" > 
-      <Takenpieces deadPieces={deadPieces["b"]} color={"b"}/>
+    <div className="container" >
+      <div className="row justify-content-between">
+          <div className="col-auto mt-3">
+              <div className="" > 
+                  <Takenpieces deadPieces={deadPieces["b"]} color={"b"}/>
       
-     </div>
+              </div>
+            </div>
+         <div className="col-auto mt-3">
+              <div className="">
+                  <Takenpieces deadPieces={deadPieces["w"]} color={"w"}/>
+              </div>
+          </div>
+        </div>
+    </div>   
         </div>
        
          <div className="col mt-5" >
@@ -367,6 +382,8 @@ function PandaBoard() {
                setMovesList({moves:[]})
                updateDeadPieces({w:{'p': 0, 'n': 0, 'b': 0, 'r': 0, 'q': 0},b:{'p': 0, 'n': 0, 'b': 0, 'r': 0, 'q': 0}})
                 clearTimeout(currentTimeout)
+                setInvalidSquare({})
+                setValidSquare({})
               }
 
         }>Restart</CustomButton>
