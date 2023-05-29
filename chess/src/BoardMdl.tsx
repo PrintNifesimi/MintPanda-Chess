@@ -357,14 +357,14 @@ function PandaBoard() {
       onPieceDragBegin={onPieceDragBegin}   
     />
     <div className="container" >
-      <div className="row justify-content-between">
+      <div className="row justify-content-center">
           <div className="col-auto mt-3">
               <div className="" > 
                   <Takenpieces deadPieces={deadPieces["b"]} color={"b"}/>
       
               </div>
             </div>
-         <div className="col-auto mt-3">
+         <div className="col-md-5 mt-3">
               <div className="">
                   <Takenpieces deadPieces={deadPieces["w"]} color={"w"}/>
               </div>
