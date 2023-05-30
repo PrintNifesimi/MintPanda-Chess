@@ -21,8 +21,7 @@ const namedPieces:any={
   "bK":"Mint King",
 }
 const StickyTh= styled.th`
-    position:sticky;
-    top:0px;
+    
   `
 
 const CustomButton = styled.button`
@@ -506,10 +505,10 @@ function Tracker(props:any){
     <thead>
       <tr>
         
-        <StickyTh scope="col">#</StickyTh>
-        <StickyTh scope="col">Piece</StickyTh>
-        <StickyTh scope="col">From</StickyTh>
-        <StickyTh scope="col">To</StickyTh>
+        <StickyTh id="stickyTh" scope="col">#</StickyTh>
+        <StickyTh id="stickyTh" scope="col">Piece</StickyTh>
+        <StickyTh id="stickyTh" scope="col">From</StickyTh>
+        <StickyTh id="stickyTh" scope="col">To</StickyTh>
       </tr>
     </thead>
     <tbody>

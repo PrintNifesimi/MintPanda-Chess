@@ -18,12 +18,12 @@ code {
 
 @media (min-width: 320px) and (max-width:500px){
   img{
-    width:25.94px;
-    height:25.94px;
+    width:31.94px;
+    height:32.94px;
    
   }
   #chessdiv{
-    width:280px;
+    width:350px;
     
     
   }
@@ -38,6 +38,10 @@ code {
     overflow-y: scroll;
     display:flex; 
    
+   
+  }
+  #stickyTH{
+    position: static;
    
   }
 }
@@ -59,11 +63,17 @@ code {
     height: 350px;
     
   }
+  #stickyTH{
+    
+    position:sticky;
+    top:0px;
+  }
+
 }
 @media (min-width:769px) and (max-width: 991px){
   img {
     width:40.75px;
-    height:40.75px;
+    height:41.75px;
     
   }
   #chessdiv{
@@ -76,11 +86,16 @@ code {
       display: flex;
     flex-direction: column-reverse;
   }
+  #stickyTH{
+    
+    position:sticky;
+    top:0px;
+  }
 }
 @media (min-width: 992px) and (max-width: 1440px){
   img {
-    width:42.75px;
-    height:42.75px;
+    width:44.75px;
+    height:45.75px;
     
   }
   #chessdiv{
@@ -88,13 +103,18 @@ code {
   }
   #makerCredit{
     margin-top: 10%;
+  }
+  #stickyTH{
+    
+    position:sticky;
+    top:0px;
   }
 }
 
 @media (min-width:1441px) and (max-width: 2560px){
   img {
-    width:42.75px;
-    height:42.75px;
+    width:44.75px;
+    height:45.75px;
     
   }
   #chessdiv{
@@ -102,6 +122,11 @@ code {
   }
   #makerCredit{
     margin-top: 10%;
+  }
+  #stickyTH{
+    
+    position:sticky;
+    top:0px;
   }
 
 }
