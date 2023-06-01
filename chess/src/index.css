@@ -73,16 +73,17 @@ code {
 @media (min-width:769px) and (max-width: 991px){
   img {
     width:40.75px;
-    height:41.75px;
+    height:44.75px;
     
   }
   #chessdiv{
-    width:450px;
+    width:490px;
   }
   #trackerDiv{
     overflow-y: auto;
-    display:flex; 
+    display:flex;
     height: 400px;
+   
       display: flex;
     flex-direction: column-reverse;
   }

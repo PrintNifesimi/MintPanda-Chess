@@ -114,6 +114,7 @@ function PandaBoard() {
   const [deadPieces, updateDeadPieces]=useState<any>({w:{'p': 0, 'n': 0, 'b': 0, 'r': 0, 'q': 0},b:{'p': 0, 'n': 0, 'b': 0, 'r': 0, 'q': 0}})
   const [currentTimeout,setCurrentTimeout]=useState<NodeJS.Timeout>();
   const [gameEnd,setGameEnd]=useState({status:["",""]})
+  const [undo,setUndo]=useState(false)
 
 
  
@@ -211,7 +212,22 @@ function PandaBoard() {
     }
     return false
     }
-
+  function undoKill(blackInfo:{[key:string]:string},whiteInfo:{[key:string]:string}){
+    if(blackInfo.hasOwnProperty("captured")){
+      let oldDeadBlackPieces = deadPieces["b"]
+      oldDeadBlackPieces[blackInfo["captured"]]-=1
+      let newDeadBlackPieces = deadPieces
+      newDeadBlackPieces["b"]=oldDeadBlackPieces
+      updateDeadPieces(newDeadBlackPieces)
+    }
+    if(whiteInfo.hasOwnProperty("captured")){
+      let oldDeadWhitePieces = deadPieces["w"]
+      oldDeadWhitePieces[whiteInfo["captured"]]-=1
+      let newDeadWhitePieces = deadPieces
+      newDeadWhitePieces["b"]=oldDeadWhitePieces
+      updateDeadPieces(newDeadWhitePieces)
+    }
+  }
   
   function getPieceCurrSquare(type:string,color:string){
     
@@ -306,7 +322,7 @@ function PandaBoard() {
    
    
    
-   
+    
    
     
    
@@ -326,6 +342,29 @@ function PandaBoard() {
      setGameEnd({status:["stalemate"]})
     }
     document.getElementById("resetBtn")?.click()
+  }
+  function undoFunction(){
+   
+   
+    
+    //console.log(game.undo())
+    //console.log(game.undo())
+  
+   if(game.turn()==='w'){
+    let whiteInfo=game.undo()
+    let blackInfo = game.undo()
+    if (whiteInfo && blackInfo){
+       undoKill(blackInfo!,whiteInfo!)
+    }
+    let moves = movesList["moves"]
+    moves.pop()
+    moves.pop()
+    setMovesList({moves:moves})
+   
+    }
+   setUndo(false)
+    return 0;
+
   }
   function pandaBrand() {
     
@@ -419,6 +458,17 @@ function PandaBoard() {
               }
 
         }>Restart</CustomButton>
+         <CustomButton 
+      style={{marginLeft:"30px"}}
+       id="undoBtn"
+       className="mt-3"
+        onClick={
+            ()=>{
+              setUndo(true)
+              undoFunction()
+            }
+       
+        }>Undo</CustomButton>
           </div>
       </div>
       <div id="makerCredit" className="container justify-content-center align-text-bottom" style={{bottom:"2px",}}>
