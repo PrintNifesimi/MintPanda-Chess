@@ -13,7 +13,10 @@ code {
     monospace;
 }
 
-
+::-webkit-scrollbar {
+  width: 0;  /* Remove scrollbar space */
+  background: transparent;  /* Optional: just make scrollbar invisible */
+}
 
 
 @media (min-width: 320px) and (max-width:500px){
@@ -129,6 +132,7 @@ code {
     position:sticky;
     top:0px;
   }
+
 
 }
 
