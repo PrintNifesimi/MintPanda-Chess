@@ -115,8 +115,7 @@ function PandaBoard() {
   const [currentTimeout,setCurrentTimeout]=useState<NodeJS.Timeout>();
   const [gameEnd,setGameEnd]=useState({status:["",""]})
   const [undo,setUndo]=useState(false)
-
-
+ 
  
   function mutateGame(changes:any) {
     const updatedState = new Chess();
@@ -162,7 +161,7 @@ function PandaBoard() {
   const possibleMoves = change.moves();
 
   // exit if the game is over
-  if (change.isGameOver() || change.isDraw() || possibleMoves.length === 0) gameOver();
+  if (change.isGameOver() || change.isDraw() || possibleMoves.length === 0) gameOver(change);
 
   const randomIndex = Math.floor(Math.random() * possibleMoves.length);
   try{
@@ -290,7 +289,7 @@ function PandaBoard() {
     if(game.turn()!=='w') return false
     setInvalidSquare({})
     setValidSquare({})
-    const change = mutateGame({
+    let change = mutateGame({
       from: fromSquare,
       to: toSquare,
       promotion: "q",
@@ -308,47 +307,55 @@ function PandaBoard() {
     }
    
    
-   
+     
    
     setGame(change); 
-      
+     
     if (change.inCheck()) checkHandler(change.turn()) 
     if(game.isGameOver() || change.isGameOver()){
      
-      gameOver();
+      gameOver(change);
     }
     if(change == null){return false} 
     //change.move('c6') 
    
-   
-   
+    let history=change.history({verbose:true})
     
-   
     
-   
+    
+  
+    
+    
     
     //call Ai
     return true;
   }
   //from react-chessboard.com
-  function gameOver(){
+  function gameOver(game:Chess){
     
+    let message:any = []
     if(game.isDraw()){
-      setGameEnd({status:["draw"]})
+      message=["draw",""]
+    
     }else if(game.isCheckmate()){
+     
+      message =["checkmate",game.turn()]
       
-      setGameEnd({status:["checkmate",game.turn()]})
+     
     }else if(game.isStalemate()){
-     setGameEnd({status:["stalemate"]})
+     message=["stalemate",""]
+
+    }else{
+
     }
-    document.getElementById("resetBtn")?.click()
+   setGameEnd({status:message})
+   
   }
+ 
+   
+  
   function undoFunction(){
    
-   
-    
-    //console.log(game.undo())
-    //console.log(game.undo())
   
    if(game.turn()==='w'){
     let whiteInfo=game.undo()
@@ -366,6 +373,9 @@ function PandaBoard() {
     return 0;
 
   }
+
+  
+ 
   function pandaBrand() {
     
     const returnPieces:any = {};
@@ -396,7 +406,9 @@ function PandaBoard() {
    
    <div className="container mt-5">
     <MintPanda>Mint-Panda</MintPanda>
-    <Win status={gameEnd}/>
+    <Win rewatch={"p"} status={gameEnd["status"]}/>
+    
+    
     <div className="container">
       
       <div className="row justify-content-center">
@@ -455,6 +467,8 @@ function PandaBoard() {
                 clearTimeout(currentTimeout)
                 setInvalidSquare({})
                 setValidSquare({})
+                setGameEnd({status:["",""]})
+                
               }
 
         }>Restart</CustomButton>
@@ -572,21 +586,39 @@ function Tracker(props:any){
 
 function Win(props:any){
  
+
+  
   if(props.status[0]==="checkmate"){
+  
     return (
-    <div className="alert alert-success mb-3" role="alert">
-    Wow how did you win {props.status[1]}
-  </div>)
+      <div>
+    <div className={props.status[1]==='b'?"alert alert-success mb-3":"alert alert-danger mb-3"} role="alert">
+    {props.status[1]==='b'?<p><b>Winner! Winner!</b> chicken dinner</p>:"How did you let a robot win"}
+    
+  </div> <CustomButton
+      onClick={()=>props.rewatch}
+      style={{display:"none"}}>Rewatch Game</CustomButton></div>)
   }else if(props.status[0]==="draw" || props.status[0]==="stalemate"){
-    return(<div className="alert alert-danger mb-3" role="alert">
-      No way you just drew with a robot damn {props.status[0]}
-</div>)
+   
+    return(
+    <div>
+    <div className="alert alert-info mb-3" role="alert">
+      {props.status[1]==='draw'?"Draw! Draw! Draw!":"StaleMate! StaleMate! StaleMate!"}
+      <br/> 
+</div><CustomButton style={{display:"none"}}
+      onClick={()=>props.rewatch}
+      >Rewatch Game</CustomButton></div>)
   }
   else{
+    
     return (<div className="alert alert-warning alert-dismissible fade show" role="alert">
     <strong>WAGWAN!</strong> My Guy's/Gal's. Enjoy.
   </div>)
   
   }
+
+  
+
+  
 }
 export default PandaBoard;
